@@ -10,8 +10,8 @@ import Foundation
 import PromiseKit
 
 extension Web3HttpProvider {
-    
-    static func post(_ request: JSONRPCrequest, providerURL: URL, queue: DispatchQueue = .main, session: URLSession) -> Promise<JSONRPCresponse> {
+
+    static func post(_ request: JSONRPCrequest, providerURL: URL, headers: RPCNodeHTTPHeaders, queue: DispatchQueue = .main, session: URLSession) -> Promise<JSONRPCresponse> {
         let rp = Promise<Data>.pending()
         var task: URLSessionTask? = nil
         queue.async {
@@ -23,6 +23,9 @@ extension Web3HttpProvider {
                 urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
                 if let basicAuth = generateBasicAuthCredentialsHeaderValue(fromURL: providerURL) {
                     urlRequest.setValue("Basic \(basicAuth)", forHTTPHeaderField: "Authorization")
+                }
+                for (key, value) in headers {
+                    urlRequest.setValue(value, forHTTPHeaderField: key)
                 }
                 urlRequest.httpBody = requestData
 //                let debugValue = try JSONSerialization.jsonObject(with: requestData, options: JSONSerialization.ReadingOptions(rawValue: 0))
@@ -65,7 +68,7 @@ extension Web3HttpProvider {
         return "\(username):\(password)".data(using: .utf8)?.base64EncodedString()
     }
 
-    static func post(_ request: JSONRPCrequestBatch, providerURL: URL, queue: DispatchQueue = .main, session: URLSession) -> Promise<JSONRPCresponseBatch> {
+    static func post(_ request: JSONRPCrequestBatch, providerURL: URL, headers: RPCNodeHTTPHeaders, queue: DispatchQueue = .main, session: URLSession) -> Promise<JSONRPCresponseBatch> {
         let rp = Promise<Data>.pending()
         var task: URLSessionTask? = nil
         queue.async {
@@ -77,6 +80,9 @@ extension Web3HttpProvider {
                 urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
                 if let basicAuth = generateBasicAuthCredentialsHeaderValue(fromURL: providerURL) {
                     urlRequest.setValue("Basic \(basicAuth)", forHTTPHeaderField: "Authorization")
+                }
+                for (key, value) in headers {
+                    urlRequest.setValue(value, forHTTPHeaderField: key)
                 }
                 urlRequest.httpBody = requestData
 //                let debugValue = try JSONSerialization.jsonObject(with: requestData, options: JSONSerialization.ReadingOptions(rawValue: 0))
@@ -113,12 +119,12 @@ extension Web3HttpProvider {
         if request.method == nil {
             return Promise(error: Web3Error.nodeError("RPC method is nill"))
         }
-        
-        return Web3HttpProvider.post(request, providerURL: self.url, queue: queue, session: self.session)
+
+        return Web3HttpProvider.post(request, providerURL: self.url, headers: headers, queue: queue, session: self.session)
     }
     
     public func sendAsync(_ requests: JSONRPCrequestBatch, queue: DispatchQueue = .main) -> Promise<JSONRPCresponseBatch> {
-        return Web3HttpProvider.post(requests, providerURL: self.url, queue: queue, session: self.session)
+        return Web3HttpProvider.post(requests, providerURL: self.url, headers: headers, queue: queue, session: self.session)
     }
 }
 

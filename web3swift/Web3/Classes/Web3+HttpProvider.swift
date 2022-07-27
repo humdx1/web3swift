@@ -25,6 +25,7 @@ public protocol Web3Provider {
 }
 
 public class Web3HttpProvider: Web3Provider {
+    public let headers: RPCNodeHTTPHeaders
     public var url: URL
     public var network: Networks?
     public var attachedKeystoreManager: KeystoreManager? = nil
@@ -33,12 +34,13 @@ public class Web3HttpProvider: Web3Provider {
         let urlSession = URLSession(configuration: config)
         return urlSession
     }()
-    public init?(_ httpProviderURL: URL, network net: Networks? = nil, keystoreManager manager: KeystoreManager? = nil) {
+    public init?(_ httpProviderURL: URL, headers: RPCNodeHTTPHeaders, network net: Networks? = nil, keystoreManager manager: KeystoreManager? = nil) {
         guard httpProviderURL.scheme == "http" || httpProviderURL.scheme == "https" else {return nil}
+        self.headers = headers
         url = httpProviderURL
         if net == nil {
             let request = JSONRPCRequestFabric.prepareRequest(.getNetwork, parameters: [])
-            let response = Web3HttpProvider.syncPost(request, providerURL: httpProviderURL)
+            let response = Web3HttpProvider.syncPost(request, providerURL: httpProviderURL, headers: headers)
             if response == nil {
                 return nil
             }
@@ -88,16 +90,16 @@ public class Web3HttpProvider: Web3Provider {
     }
     
     internal func syncPostRaw(_ request: JSONRPCrequest) -> Any? {
-        return Web3HttpProvider.syncPost(request, providerURL: self.url)
+        return Web3HttpProvider.syncPost(request, providerURL: self.url, headers: headers)
     }
-    
-    static func syncPostRaw(_ request: JSONRPCrequest, providerURL: URL) -> Any? {
+
+    static func syncPostRaw(_ request: JSONRPCrequest, providerURL: URL, headers: RPCNodeHTTPHeaders) -> Any? {
         guard let _ = try? JSONEncoder().encode(request) else {return nil}
         //        print(String(data: try! JSONEncoder().encode(request), encoding: .utf8))
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json"
-        ]
+        ].merging(headers) {(_,new) in new}
         let response = Alamofire.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headers).responseData()
         switch response.result {
         case .success(let resp):
@@ -109,21 +111,21 @@ public class Web3HttpProvider: Web3Provider {
     }
     
     internal func syncPost(_ request: JSONRPCrequest) -> Any? {
-        return Web3HttpProvider.syncPost(request, providerURL: self.url)
+        return Web3HttpProvider.syncPost(request, providerURL: self.url, headers: headers)
     }
     
     internal func syncPost(_ requests: [JSONRPCrequest]) -> Any? {
         let batch = JSONRPCrequestBatch(requests: requests)
-        return Web3HttpProvider.syncPost(batch, providerURL: self.url)
+        return Web3HttpProvider.syncPost(batch, providerURL: self.url, headers: headers)
     }
     
-    static func syncPost(_ request: JSONRPCrequest, providerURL: URL) -> Any? {
+    static func syncPost(_ request: JSONRPCrequest, providerURL: URL, headers: RPCNodeHTTPHeaders) -> Any? {
         guard let _ = try? JSONEncoder().encode(request) else {return nil}
 //        print(String(data: try! JSONEncoder().encode(request), encoding: .utf8))
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json"
-        ]
+        ].merging(headers) {(_,new) in new}
         let response = Alamofire.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headers).responseJSON()
         switch response.result {
         case .success(let resp):
@@ -134,13 +136,13 @@ public class Web3HttpProvider: Web3Provider {
         }
     }
     
-    static func syncPost(_ request: JSONRPCrequestBatch, providerURL: URL) -> Any? {
+    static func syncPost(_ request: JSONRPCrequestBatch, providerURL: URL, headers: RPCNodeHTTPHeaders) -> Any? {
         guard let _ = try? JSONEncoder().encode(request) else {return nil}
 //        print(String(data: try! JSONEncoder().encode(request), encoding: .utf8))
         let headers: HTTPHeaders = [
             "Content-Type": "application/json",
             "Accept": "application/json"
-        ]
+        ].merging(headers) {(_,new) in new}
         let response = Alamofire.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headers).responseJSON()
         switch response.result {
         case .success(let resp):
