@@ -18,7 +18,7 @@ public class InfuraProvider: Web3HttpProvider {
             requestURLstring = requestURLstring + token!
         }
         let providerURL = URL(string: requestURLstring)
-        super.init(providerURL!, network: net, keystoreManager: manager)
+        super.init(providerURL!, headers: .init(), network: net, keystoreManager: manager)
     }
     
     enum supportedPostMethods: String {
