@@ -96,7 +96,7 @@ extension Web3HttpProvider {
     
     public func sendAsync(_ request: JSONRPCrequest, queue: DispatchQueue = .main) -> Promise<JSONRPCresponse> {
         if request.method == nil {
-            return Promise(error: Web3Error.nodeError("RPC method is nill"))
+            return Promise(error: Web3Error.nodeError("RPC method is nil"))
         }
         
         return Web3HttpProvider.post(request, providerURL: self.url, queue: queue, session: self.session)
