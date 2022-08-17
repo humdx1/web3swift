@@ -79,7 +79,11 @@ public struct JSONRPCrequestBatch: Encodable, ParameterEncoding  {
     }
 }
 
-public struct JSONRPCresponse: Decodable{
+public enum DecodeError: Error {
+    case typeMismatch
+}
+
+public struct JSONRPCresponse: Decodable {
     public var id: Int
     public var jsonrpc = "2.0"
     public var result: Any?
@@ -101,78 +105,72 @@ public struct JSONRPCresponse: Decodable{
     }
     
     public struct ErrorMessage: Decodable {
+        enum Keys: String, CodingKey {
+            case code
+            case message
+            case data
+        }
+
         public var code: Int
         public var message: String
         public var data: String?
-    }
-    
-    internal var decodableTypes: [Decodable.Type] = [[EventLog].self,
-                                  [TransactionDetails].self,
-                                  [TransactionReceipt].self,
-                                  [Block].self,
-                                  [String].self,
-                                  [Int].self,
-                                  [Bool].self,
-                                  EventLog.self,
-                                  TransactionDetails.self,
-                                  TransactionReceipt.self,
-                                  Block.self,
-                                  String.self,
-                                  Int.self,
-                                  Bool.self,
-                                  [String:String].self,
-                                  [String:Int].self]
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: Keys.self)
+            do {
+                self.code = try container.decode(Int.self, forKey: .code)
+            } catch {
+                guard let codeString: String = try? container.decode(String.self, forKey: .code), let code = Int(codeString) else { throw DecodeError.typeMismatch }
+                self.code = code
+            }
+            message = try container.decode(String.self, forKey: .message)
+        }
+    } 
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: JSONRPCresponseKeys.self)
         let id: Int = try container.decode(Int.self, forKey: .id)
         let jsonrpc: String = try container.decode(String.self, forKey: .jsonrpc)
-        let errorMessage = try container.decodeIfPresent(ErrorMessage.self, forKey: .error)
-        if errorMessage != nil {
+
+        if let errorMessage = try? container.decode(ErrorMessage.self, forKey: .error) {
             self.init(id: id, jsonrpc: jsonrpc, result: nil, error: errorMessage)
-            return
+        } else {
+            var result: Any? = nil
+            if let rawValue = try? container.decodeIfPresent(String.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent(Int.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent(Bool.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent(EventLog.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent(Block.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent(TransactionReceipt.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent(TransactionDetails.self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([EventLog].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([Block].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([TransactionReceipt].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([TransactionDetails].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([Bool].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([Int].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([String].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([String: String].self, forKey: .result) {
+                result = rawValue
+            } else if let rawValue = try? container.decodeIfPresent([String: Int].self, forKey: .result) {
+                result = rawValue
+            }
+            self.init(id: id, jsonrpc: jsonrpc, result: result, error: nil)
         }
-        var result: Any? = nil
-//        for type in decodableTypes {
-//            if let rawValue = try? container.decodeIfPresent(type, forKey: .result) {
-//                result = rawValue
-//                break
-//            }
-//        }
-        if let rawValue = try? container.decodeIfPresent(String.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent(Int.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent(Bool.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent(EventLog.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent(Block.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent(TransactionReceipt.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent(TransactionDetails.self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([EventLog].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([Block].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([TransactionReceipt].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([TransactionDetails].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([Bool].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([Int].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([String].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([String: String].self, forKey: .result) {
-            result = rawValue
-        } else if let rawValue = try? container.decodeIfPresent([String: Int].self, forKey: .result) {
-            result = rawValue
-        } 
-        self.init(id: id, jsonrpc: jsonrpc, result: result, error: nil)
     }
     
     public func getValue<T>() -> T? {
