@@ -123,6 +123,7 @@ public struct JSONRPCresponse: Decodable {
                 guard let codeString: String = try? container.decode(String.self, forKey: .code), let code = Int(codeString) else { throw DecodeError.typeMismatch }
                 self.code = code
             }
+            data = try container.decodeIfPresent(String.self, forKey: .data)
             message = try container.decode(String.self, forKey: .message)
         }
     } 
