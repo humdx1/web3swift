@@ -19,7 +19,8 @@ public struct Web3Options {
     public var gasLimit: BigUInt? = nil
     public var gasPrice: BigUInt? = nil
     public var value: BigUInt? = nil
-    
+    public var excludeZeroGasPrice: Bool = false
+
     public init() {
     }
     
@@ -75,6 +76,9 @@ public struct Web3Options {
             newOptions.gasPrice = other?.gasPrice
         } else {
             newOptions.gasPrice = options?.gasPrice
+        }
+        if let other = other {
+            newOptions.excludeZeroGasPrice = other.excludeZeroGasPrice
         }
         if (other?.value != nil) {
             newOptions.value = other?.value

@@ -395,6 +395,7 @@ extension web3.web3contract.TransactionIntermediate {
         optionsForCall.from = mergedOptions.from
         optionsForCall.to = mergedOptions.to
         optionsForCall.value = mergedOptions.value
+        optionsForCall.excludeZeroGasPrice = mergedOptions.excludeZeroGasPrice
 
         let callPromise: Promise<Data> = eth.callPromise(transaction, options: optionsForCall, onBlock: onBlock)
         let method = method
