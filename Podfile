@@ -1,7 +1,4 @@
 def import_pods
-  pod 'Alamofire', '~> 4.7'
-  pod 'Alamofire-Synchronous', '~> 4.0'
-  pod "PromiseKit", "~> 6.0"
   pod 'BigInt', '~> 3.0'
   pod 'CryptoSwift', '~> 1.0'
   pod 'Result', '~> 3.0.0'
