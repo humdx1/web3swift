@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Result
 import enum Result.Result
 import BigInt
 import PromiseKit
@@ -20,7 +21,7 @@ extension web3.web3contract {
         public var filter: EventFilter?
         var web3: web3
         public init? (web3 web3Instance: web3, eventName: String, contract: ContractProtocol, filter: EventFilter? = nil) {
-            guard let _ = contract.allEvents.index(of: eventName) else {return nil}
+            guard let _ = contract.allEvents.firstIndex(of: eventName) else {return nil}
             self.eventName = eventName
             self.web3 = web3Instance
             self.contract = contract

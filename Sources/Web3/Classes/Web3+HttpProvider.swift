@@ -8,7 +8,7 @@
 
 import Foundation
 import Alamofire
-import Alamofire_Synchronous
+//import Alamofire_Synchronous
 import BigInt
 import PromiseKit
 
@@ -96,11 +96,14 @@ public class Web3HttpProvider: Web3Provider {
     static func syncPostRaw(_ request: JSONRPCrequest, providerURL: URL, headers: RPCNodeHTTPHeaders) -> Any? {
         guard let _ = try? JSONEncoder().encode(request) else {return nil}
         //        print(String(data: try! JSONEncoder().encode(request), encoding: .utf8))
-        let headers: HTTPHeaders = [
+        let headers = [
             "Content-Type": "application/json",
             "Accept": "application/json"
         ].merging(headers) {(_,new) in new}
-        let response = Alamofire.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headers).responseData()
+
+        let headersHTTP = HTTPHeaders(headers)
+
+        let response = AF.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headersHTTP).responseData()
         switch response.result {
         case .success(let resp):
             return resp
@@ -122,11 +125,14 @@ public class Web3HttpProvider: Web3Provider {
     static func syncPost(_ request: JSONRPCrequest, providerURL: URL, headers: RPCNodeHTTPHeaders) -> Any? {
         guard let _ = try? JSONEncoder().encode(request) else {return nil}
 //        print(String(data: try! JSONEncoder().encode(request), encoding: .utf8))
-        let headers: HTTPHeaders = [
+        let headers = [
             "Content-Type": "application/json",
             "Accept": "application/json"
         ].merging(headers) {(_,new) in new}
-        let response = Alamofire.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headers).responseJSON()
+
+        let headersHTTP = HTTPHeaders(headers)
+
+        let response = AF.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headersHTTP).responseJSON()
         switch response.result {
         case .success(let resp):
             return resp
@@ -139,11 +145,14 @@ public class Web3HttpProvider: Web3Provider {
     static func syncPost(_ request: JSONRPCrequestBatch, providerURL: URL, headers: RPCNodeHTTPHeaders) -> Any? {
         guard let _ = try? JSONEncoder().encode(request) else {return nil}
 //        print(String(data: try! JSONEncoder().encode(request), encoding: .utf8))
-        let headers: HTTPHeaders = [
+        let headers = [
             "Content-Type": "application/json",
             "Accept": "application/json"
         ].merging(headers) {(_,new) in new}
-        let response = Alamofire.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headers).responseJSON()
+
+        let headersHTTP = HTTPHeaders(headers)
+
+        let response = AF.request(providerURL, method: .post, parameters: nil, encoding: request, headers: headersHTTP).responseJSON()
         switch response.result {
         case .success(let resp):
             return resp

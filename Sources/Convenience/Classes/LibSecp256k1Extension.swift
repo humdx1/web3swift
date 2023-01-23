@@ -1,6 +1,6 @@
 
 import Foundation
-import secp256k1_ios
+import secp256k1
 import BigInt
 
 

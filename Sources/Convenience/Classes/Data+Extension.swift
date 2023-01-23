@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import libsodium
+import Clibsodium
 
 
 public extension Data {

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+
 import enum Result.Result
 import BigInt
 import PromiseKit
@@ -45,7 +46,7 @@ extension web3.web3contract {
             guard let operation = ContractSendOperation.init(web3, queue: web3.queue, intermediate: self, options: options, onBlock: onBlock, password: password) else {
                 guard let dispatchQueue =  queue.underlyingQueue else {return}
                 return dispatchQueue.async {
-                    callback(Result<AnyObject, Web3Error>.failure(Web3Error.dataError))
+                    callback( Result<AnyObject, Web3Error>.failure(Web3Error.dataError))
                 }
             }
             operation.next = OperationChainingType.callback(callback, queue)
