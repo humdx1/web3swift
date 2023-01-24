@@ -15,7 +15,7 @@ let package = Package(
         .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.4.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.8.0"),
         .package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-        .package(url: "https://github.com/antitypical/Result", exact: "4.0.1"),
+        .package(url: "https://github.com/antitypical/Result", exact: "4.0.0"),
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift", from: "1.6.0"),
         .package(url: "https://github.com/jedisct1/swift-sodium", from: "0.9.0"),
         .package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", .upToNextMajor(from: "0.8.1")),
