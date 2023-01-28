@@ -17,7 +17,7 @@ let package = Package(
         .package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
         .package(url: "https://github.com/antitypical/Result", exact: "4.0.1"),
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift", from: "1.0.0"),
-        .package(url: "https://github.com/jedisct1/swift-sodium", from: "0.9.0"),
+        .package(url: "https://github.com/humdx1/Sodium", branch: "master"),
         .package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", .upToNextMajor(from: "0.8.1")),
     ],
     targets: [
@@ -25,7 +25,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "web3swift",
-            dependencies: ["BigInt","Result","CryptoSwift", "PromiseKit", "Alamofire", .product(name: "secp256k1", package: "secp256k1.swift"), .product(name: "Clibsodium", package: "swift-sodium"),.product(name: "Sodium", package: "swift-sodium")],
+            dependencies: ["BigInt","Result","CryptoSwift", "PromiseKit", "Alamofire", .product(name: "secp256k1", package: "secp256k1.swift"), .product(name: "Clibsodium", package: "Sodium")],
             path: "Sources"),
         .testTarget(
             name: "web3swiftTests",
